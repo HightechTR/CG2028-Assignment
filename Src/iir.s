@@ -4,12 +4,12 @@
  *  Created on: 29/7/2025
  *      Author: Ni Qingqing
  */
-   .syntax unified
- .cpu cortex-m4
- .fpu softvfp
- .thumb
+.syntax unified
+.cpu cortex-m4
+.fpu softvfp
+.thumb
 
-  .global iir
+.global iir
 
 @ Start of executable code
 .section .text
@@ -33,44 +33,41 @@
 
 
 iir:
-	PUSH {R14}
+    PUSH {R14}
 
-	BL SUBROUTINE
+    BL SUBROUTINE
 
-	POP {R14}
+    POP {R14}
 
-	BX LR
+    BX LR
 
 SUBROUTINE:
-	LDR R7, =STORE
-	MOV R5, R7
-	LDR R4, [R7, #96] @ getting the value of NUMS
-	ADD R5, R4
-	ADD R5, #96
-	STR R3, [R5, #-48] @ put X_n in to the SRAM
-	SUBS R4, #4
-	ADD R4, R5, #1
-	LDR R7, [R1], #4 @ B0
-	LDR R8, [R2], #4 @ A0
-	MUL R3, R7
+    LDR R5, =STORE
+    LDR R4, [R5], #96 @ getting the value of NUMS
+    STR R3, [R5, R4]!@ put X_n in to the SRAM
+    SUB R4, #4
+    STR R4, =STORE
+    MOV R4, R5
+    LDR R6, [R1], #4 @B0
+    LDR R7, [R2], #4 @a0
+    MUL R3, R6
 
-	LOOP:
-		LDR R11, [R4, #-48] @ X
-		LDR R10, [R4], #4 @ Y
-		LDR R7, [R1], #4 @ b
-		LDR R6, [R2], #4 @a
-		MLA R9, R11, R7, R9
-		MLS R9, R10, R6, R9
-		SUBS R0, #1
-		BPL LOOP
+ LOOP:  LDR R6, [R5, #-48] @ Y
+        LDR R8, [R2], #4 @ a
+        MLS R3, R6, R8, R3
+        LDR R6, [R5], #4 @ x
+        LDR R8, [R1], #4 @ b
+        MLA R3, R6, R8, R3
+        SUBS R0, #1
+        BPL LOOP
 
-	MLA R9, R3, R7, R9
-	SDIV R0, R9, R8
-	STR R0, [R5]
-
-	BX LR
+    SDIV R0, R3, R7
+    STR R0, [R4, #-48]
+    MOV R1, #100
+    SDIV R0, R1
+    BX LR
 
 
 @ static arrays in SRAM
-.lcomm STORE 100
+.lcomm STORE 152
 .end
