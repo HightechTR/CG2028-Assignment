@@ -44,19 +44,23 @@ iir:
    	LDR R7, [R2], #4 @ load a0
    	MUL R3, R6 @ x_n * b0
 
- LOOP:   LDR R6, [R5, #-52] @ load Y
-	     LDR R8, [R2], #4 @ load a
-	     MLS R3, R6, R8, R3 @ multiply & sub y * a
-	     LDR R6, [R5], #4 @ load X and offset R5 at the same time
-	     LDR R8, [R1], #4 @ load b
-	     MLA R3, R6, R8, R3 @ multiply & add y * b
+ LOOP:   LDR  R6, [R5, #-52] @ load Y
+	     LDR  R8, [R2], #4 @ load a
+	     MLS  R3, R6, R8, R3 @ multiply & sub y * a
+	     LDR  R6, [R5], #4 @ load X and offset R5 at the same time
+	     LDR  R8, [R1], #4 @ load b
+	     MLA  R3, R6, R8, R3 @ multiply & add y * b
 	     ADDS R0, #-1 @ decrement N
-	     BNE LOOP @ loop if N != 0
+	     BNE  LOOP @ loop if N != 0
 
   	SDIV R0, R3, R7 @ divide by a0
     STR R0, [R4, #-56] @ store result
     MOV R1, #100 @ load value of 100
     SDIV R0, R1 @ divide y_n by 100
+
+	//LDR   R1, =0x51EB851F
+    //SMULL R2, R3, R0, R1
+    //ASR   R0, R3, #5
 
   	POP {R4-R9, R14}
 
